@@ -6,26 +6,26 @@ function HomePage() {
       id: 1,
       name: "Tesla Model 3",
       price: "₹4,500/day",
-      img: "https://www.tesla.com/sites/default/files/modelsx-new/social/model-3-hero-social.jpg",
+      img: "https://www.bing.com/th/id/OIP.D-paruT1nvRn917pZp7QogHaEo?w=244&h=211&c=8&rs=1&qlt=90&o=6&dpr=1.3&pid=3.1&rm=2",
     },
     {
       id: 2,
       name: "BMW X5",
       price: "₹6,800/day",
-      img: "https://www.bmwusa.com/content/dam/bmwusa/X5/2024/Overview/BMW-MY24-X5-Overview-01.jpg",
+      img: "https://tse3.mm.bing.net/th/id/OIP.rUCGL0diLE8tlmuTcVnU5gHaEK?rs=1&pid=ImgDetMain&o=7&rm=3",
     },
     {
       id: 3,
       name: "Audi A6",
       price: "₹5,200/day",
-      img: "https://www.audi.in/dam/nemo/models/a6/a6-limousine/my-2024/overview/1920x1080-gallery/1920x1080_DSC09069.jpg",
+      img: "https://www.autocar.co.uk/sites/autocar.co.uk/files/images/car-reviews/first-drives/legacy/audi-e-tron-facelift-front-three-quarter.jpg",
     },
   ];
 
   return (
     <>
      
-      <section className="relative bg-blue-600 text-white py-20 px-6 text-center">
+      <section className="relative bg-green-600 text-white py-20 px-6 text-center">
         <h2 className="text-4xl font-bold mb-4">Rent Your Dream Car Today</h2>
         <p className="mb-6 text-lg">Affordable. Reliable. Convenient.</p>
         <button className="bg-white text-blue-600 font-semibold px-6 py-3 rounded-lg shadow hover:bg-gray-100">
