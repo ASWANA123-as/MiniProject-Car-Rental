@@ -1,6 +1,12 @@
 import React from "react";
-
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 function HomePage() {
+   const navigate = useNavigate();
+const [search, setSearch] = useState("");
+  const handleLoginClick = () => {
+    navigate("/login"); // navigates to Login page
+  };
   const cars = [
     {
       id: 1,
@@ -25,15 +31,43 @@ function HomePage() {
   return (
     <>
      
-      <section className="relative bg-green-600 text-white py-20 px-6 text-center">
-        <h2 className="text-4xl font-bold mb-4">Rent Your Dream Car Today</h2>
-        <p className="mb-6 text-lg">Affordable. Reliable. Convenient.</p>
-        <button className="bg-white text-blue-600 font-semibold px-6 py-3 rounded-lg shadow hover:bg-gray-100">
-          Book Now
-        </button>
-      </section>
+    <section>
+       <div className="mt-10 max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-6 flex flex-col md:flex-row gap-4 items-center">
+          <input
+            type="text"
+            placeholder="Pick-up Location"
+            className="w-full md:w-1/4 p-2 border rounded"
+          />
+          <input
+            type="text"
+            placeholder="Drop-off Location"
+            className="w-full md:w-1/4 p-2 border rounded"
+          />
+          <input
+            type="date"
+            className="w-full md:w-1/4 p-2 border rounded"
+          />
+          <input
+            type="date"
+            className="w-full md:w-1/4 p-2 border rounded"
+          />
+          <button className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition">
+            Search
+          </button>
+        </div>
+    </section>
 
-      
+<section>
+  <section className="max-w-4xl mx-auto mt-10 px-6">
+        <input
+          type="text"
+          placeholder="Search by car name or type..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full p-3 border rounded shadow"
+        />
+      </section>
+</section>
 
       
       <section className="p-6 flex-1">

@@ -1,28 +1,49 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
 
-function NavBar() {
+export default function NavBar() {
+  const [currentUser, setCurrentUser] = useState(null);
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("currentUser"));
+    setCurrentUser(user);
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("currentUser");
+    setCurrentUser(null);
+    window.location.href = "/"; // redirect to home
+  };
+
   return (
-    <div>
-        <nav className="bg-indigo-600 text-white px-6 py-3 shadow-md">
-      <div className="max-w-7xl mx-auto flex justify-between items-center">
-        {/* Logo */}
-        <h1 className="text-xl font-bold tracking-wide">
-         CAR RENTAL
-        </h1>
+    <nav className="bg-blue-600 text-white px-6 py-4 flex justify-between items-center">
+      {/* Logo / App Name */}
+      <Link to="/" className="text-2xl font-bold">CarRental</Link>
 
-        {/* Nav Links */}
-        <div className="flex space-x-6">
-          <Link to="/" className="hover:text-gray-200 transition">Home</Link>
-          <Link to="/about" className="hover:text-gray-200 transition">About</Link>
-          <Link to="/cars" className="hover:text-gray-200 transition">CARS</Link>
-          <Link to="/contact" className="hover:text-gray-200 transition">Contact</Link>
-         
-        </div>
+      {/* Nav Links */}
+      <div className="flex items-center gap-6">
+        <Link to="/" className="hover:text-gray-200 transition">Home</Link>
+
+        {!currentUser && (
+          <>
+            <Link to="/login" className="hover:text-gray-200 transition">Login</Link>
+            <Link to="/register" className="hover:text-gray-200 transition">Register</Link>
+          </>
+        )}
+
+        {currentUser && (
+          <>
+            {currentUser.role === "Admin" ? (
+              <Link to="/admin" className="hover:text-gray-200 transition">Dashboard</Link>
+            ) : (
+              <Link to="/customer" className="hover:text-gray-200 transition">Dashboard</Link>
+            )}
+            <button onClick={handleLogout} className="bg-white text-blue-600 px-3 py-1 rounded hover:bg-gray-200 transition">
+              Logout
+            </button>
+          </>
+        )}
       </div>
     </nav>
-    </div>
-  )
+  );
 }
-
-export default NavBar

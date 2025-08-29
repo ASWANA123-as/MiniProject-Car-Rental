@@ -9,34 +9,47 @@ import Home from './Pages/Home'
 import About from './Pages/About'
 import Cars from './Pages/Cars'
 import Contact from './Pages/Contact'
-
+import Layout from './Components/Layout'
+import Login from './Pages/Login'
+import Register from './Pages/Register'
+import AdminDashboard from './Pages/AdminDashboard'
+import CustomerDashboard from './Pages/CustomerDashboard'
 function App() {
   const [count, setCount] = useState(0)
+
   const router=createBrowserRouter([
+    // {
+    //    path: "/",
+    // element: <HomePage />,
+    // },
     {
       path:'/',
-      element:<NavBar/>,
+      element:<Layout/>,
       children:[
         {path:'/',element:<Home/>},
          {path:'/about',element:<About/>},
-          {path:'/cars',element:<Cars/>},
+         
            {path:'/contact',element:<Contact/>},
          
       ]
-    }
+    },
+     {
+    path: "/login",
+    element: <Login />,
+  },
+  { path: "/admin", element: <AdminDashboard /> },
+  { path: "/customer", element: <CustomerDashboard /> },
+   {
+    path: "/register",
+    element: <Register/>,
+  },
+    {
+    path: "/cars",
+    element: <Cars />,
+  },
   ])
 
-  return  (
-    
-    <>
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-        <Header/>
-    <HomePage/>
-    <Footer/>
-    </div>
-  
-    </>
-  )
+  return  <RouterProvider  router={router}/>
 }
 
 export default App
