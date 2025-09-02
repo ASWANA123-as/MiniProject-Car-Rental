@@ -18,12 +18,13 @@ export default function NavBar() {
   return (
     <nav className="bg-blue-600 text-white px-6 py-4 flex justify-between items-center">
       {/* Logo / App Name */}
-      <Link to="/" className="text-2xl font-bold">CarRental</Link>
+      <Link to="/" className="text-2xl font-bold">🚗 CarRental</Link>
 
       {/* Nav Links */}
       <div className="flex items-center gap-6">
         <Link to="/" className="hover:text-gray-200 transition">Home</Link>
 
+        {/* If not logged in */}
         {!currentUser && (
           <>
             <Link to="/login" className="hover:text-gray-200 transition">Login</Link>
@@ -31,14 +32,28 @@ export default function NavBar() {
           </>
         )}
 
+        {/* If logged in */}
         {currentUser && (
           <>
-            {currentUser.role === "Admin" ? (
+            {/* Admin-specific links */}
+            {currentUser.role === "Admin" && (
               <Link to="/admin" className="hover:text-gray-200 transition">Dashboard</Link>
-            ) : (
-              <Link to="/customer" className="hover:text-gray-200 transition">Dashboard</Link>
             )}
-            <button onClick={handleLogout} className="bg-white text-blue-600 px-3 py-1 rounded hover:bg-gray-200 transition">
+
+            {/* Customer-specific links */}
+            {currentUser.role === "Customer" && (
+              <>
+                <Link to="/customer" className="hover:text-gray-200 transition">Dashboard</Link>
+                <Link to="bookings" className="hover:text-gray-200 transition">Bookings</Link>
+
+              </>
+            )}
+
+            {/* Logout button */}
+            <button
+              onClick={handleLogout}
+              className="bg-white text-blue-600 px-3 py-1 rounded hover:bg-gray-200 transition"
+            >
               Logout
             </button>
           </>

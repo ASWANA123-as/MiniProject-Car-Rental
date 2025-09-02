@@ -14,6 +14,8 @@ import Login from './Pages/Login'
 import Register from './Pages/Register'
 import AdminDashboard from './Pages/AdminDashboard'
 import CustomerDashboard from './Pages/CustomerDashboard'
+import PaymentPage from './Pages/PaymentPage'
+import BookingsPage from './Pages/Bookings'
 function App() {
   const [count, setCount] = useState(0)
 
@@ -33,12 +35,17 @@ function App() {
          
       ]
     },
+    {path:'/',element:<HomePage/>},
      {
     path: "/login",
     element: <Login />,
   },
   { path: "/admin", element: <AdminDashboard /> },
-  { path: "/customer", element: <CustomerDashboard /> },
+  { path: "/customer", element: <CustomerDashboard />
+   
+   },
+   { path: "/customer/bookings", element: <BookingsPage /> },
+   { path: "/bookings", element: <BookingsPage /> },
    {
     path: "/register",
     element: <Register/>,
@@ -47,6 +54,11 @@ function App() {
     path: "/cars",
     element: <Cars />,
   },
+  {
+    path: "/payment",
+    element: <PaymentPage />,
+  },
+  
   ])
 
   return  <RouterProvider  router={router}/>

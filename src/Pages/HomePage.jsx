@@ -38,19 +38,7 @@ const [search, setSearch] = useState("");
             placeholder="Pick-up Location"
             className="w-full md:w-1/4 p-2 border rounded"
           />
-          <input
-            type="text"
-            placeholder="Drop-off Location"
-            className="w-full md:w-1/4 p-2 border rounded"
-          />
-          <input
-            type="date"
-            className="w-full md:w-1/4 p-2 border rounded"
-          />
-          <input
-            type="date"
-            className="w-full md:w-1/4 p-2 border rounded"
-          />
+          
           <button className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition">
             Search
           </button>

@@ -1,135 +1,239 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  PieChart, Pie, Cell, Tooltip, BarChart, Bar,
+  XAxis, YAxis, CartesianGrid, Legend, ResponsiveContainer
+} from "recharts";
 
 export default function AdminDashboard() {
   const [cars, setCars] = useState([]);
-  const [newCar, setNewCar] = useState({
-    name: "",
-    type: "",
-    price: "",
-    image: "",
-  });
+  const [bookings, setBookings] = useState([]);
+  const [formData, setFormData] = useState({ id:"",name: "", type: "", price: "", image: "" });
+  const [editIndex, setEditIndex] = useState(null);
+  const [darkMode, setDarkMode] = useState(
+    JSON.parse(localStorage.getItem("darkMode")) || false
+  );
 
-  // Load cars from API + localStorage
   useEffect(() => {
-    fetch("https://aswana123-as.github.io/cars-API/Cars.json")
+    // Fetch cars from API
+    fetch("https://aswana123-as.github.io/Cars_1_API/Cars.json")
       .then((res) => res.json())
       .then((data) => {
         const localCars = JSON.parse(localStorage.getItem("adminCars")) || [];
         setCars([...data, ...localCars]);
       })
       .catch((err) => console.error("Error fetching cars:", err));
-  }, []);
 
-  // Handle form input
-  const handleChange = (e) => {
-    setNewCar({ ...newCar, [e.target.name]: e.target.value });
+    // Load bookings
+    const storedBookings = JSON.parse(localStorage.getItem("bookings")) || [];
+    setBookings(storedBookings);
+  }, []);
+const navigate = useNavigate();
+  // --- Analytics ---
+  const totalCars = cars.length;
+  const totalBookings = bookings.length;
+  const totalRevenue = bookings.reduce((sum, b) => sum + (b.totalCost || 0), 0);
+
+  const typeCount = cars.reduce((acc, car) => {
+    acc[car.type] = (acc[car.type] || 0) + 1;
+    return acc;
+  }, {});
+
+  const typeData = Object.entries(typeCount).map(([type, count]) => ({
+    name: type,
+    value: count,
+  }));
+
+  const bookingCount = bookings.reduce((acc, b) => {
+    acc[b.name] = (acc[b.name] || 0) + 1;
+    return acc;
+  }, {});
+
+  const bookingData = Object.entries(bookingCount)
+    .map(([name, count]) => ({ name, bookings: count }))
+    .sort((a, b) => b.bookings - a.bookings);
+
+  const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#A569BD"];
+  const formatCurrency = (v) =>
+    new Intl.NumberFormat("en-US", { style: "currency", currency: "INR" }).format(v);
+
+  // --- Car Management Functions ---
+  const saveCarsToLocal = (updatedCars) => {
+    localStorage.setItem("adminCars", JSON.stringify(updatedCars.filter(c => c.isLocal)));
   };
 
-  // Add new car
-  const handleAddCar = () => {
-    if (!newCar.name || !newCar.type || !newCar.price || !newCar.image) {
+  const handleAddOrUpdate = () => {
+    if (!formData.name || !formData.type || !formData.price || !formData.image) {
       alert("Please fill all fields");
       return;
     }
+    
 
-    const updatedCars = [...cars, { ...newCar, id: Date.now() }];
+    let updatedCars;
+    if (editIndex !== null) {
+      // update existing
+      updatedCars = cars.map((car, i) =>
+        i === editIndex ? { ...formData, price: Number(formData.price), isLocal: true,id:21  } : car
+      );
+      setEditIndex(null);
+    } else {
+      // add new
+      updatedCars = [...cars, { ...formData, price: Number(formData.price), isLocal: true,id:21 }];
+    }
+
     setCars(updatedCars);
-
-    // Save only new cars in localStorage
-    const localCars = JSON.parse(localStorage.getItem("adminCars")) || [];
-    localStorage.setItem("adminCars", JSON.stringify([...localCars, newCar]));
-
-    setNewCar({ name: "", type: "", price: "", image: "" });
+    saveCarsToLocal(updatedCars);
+    setFormData({ id:"",name: "", type: "", price: "", image: "" });
   };
 
-  // Delete car (only local ones)
-  const handleDeleteCar = (id) => {
-    const updatedCars = cars.filter((car) => car.id !== id);
-    setCars(updatedCars);
-
-    // Update localStorage
-    const localCars = JSON.parse(localStorage.getItem("adminCars")) || [];
-    const newLocalCars = localCars.filter((car) => car.id !== id);
-    localStorage.setItem("adminCars", JSON.stringify(newLocalCars));
+  const handleEdit = (index) => {
+    setFormData(cars[index]);
+    setEditIndex(index);
   };
+
+  const handleDelete = (index) => {
+    const updatedCars = cars.filter((_, i) => i !== index);
+    setCars(updatedCars);
+    saveCarsToLocal(updatedCars);
+  };
+   useEffect(() => {
+    localStorage.setItem("darkMode", JSON.stringify(darkMode));
+  }, [darkMode]);
 
   return (
-    <div className="p-6">
-      <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
+    <div className={darkMode ? "bg-gray-900 text-white min-h-screen p-8" : "bg-gray-100 text-black min-h-screen p-8"} >
+     
+      <h1 className="text-3xl font-bold mb-6">📊 Admin Analytics Dashboard</h1>
+    <button
+            onClick={() => setDarkMode(!darkMode)}
+            className="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600"
+          >
+            {darkMode ? "☀️ Light Mode" : "🌙 Dark Mode"}
+          </button>
+           <button
+              onClick={() => navigate("/")}
+              className="px-4 py-2 rounded bg-red-500 text-white hover:bg-red-600"
+            >
+              Exit
+            </button>
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+        <div className={darkMode ? "bg-gray-800 shadow p-6 rounded text-center" : "bg-white shadow p-6 rounded text-center"}>
+          <h3 className="text-lg font-semibold">Total Cars</h3>
+          <p className="text-2xl font-bold text-blue-600">{totalCars}</p>
+        </div>
+        <div className={darkMode ? "bg-gray-800 shadow p-6 rounded text-center" : "bg-white shadow p-6 rounded text-center"}>
+          <h3 className="text-lg font-semibold">Total Bookings</h3>
+          <p className="text-2xl font-bold text-green-600">{totalBookings}</p>
+        </div>
+        <div className={darkMode ? "bg-gray-800 shadow p-6 rounded text-center" : "bg-white shadow p-6 rounded text-center"}>
+          <h3 className="text-lg font-semibold">Revenue</h3>
+          <p className="text-2xl font-bold text-purple-600">{formatCurrency(totalRevenue)}</p>
+        </div>
+      </div>
 
-      {/* Add Car Form */}
-      <div className="bg-white p-4 shadow rounded mb-6">
-        <h2 className="text-xl font-semibold mb-4">Add New Car</h2>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      {/* Charts */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+        {/* Pie Chart */}
+        <div className={darkMode ? "bg-gray-800 shadow rounded p-6" : "bg-white shadow rounded p-6"}>
+          <h3 className="text-lg font-bold mb-4">Car Types Distribution</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie data={typeData} dataKey="value" nameKey="name" outerRadius={100} label>
+                {typeData.map((_, index) => (
+                  <Cell key={index} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Bar Chart */}
+        <div className="bg-white shadow rounded p-6">
+          <h3 className="text-lg font-bold mb-4">Bookings per Car</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={bookingData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="bookings" fill="#8884d8" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* Car Management */}
+      <div className={darkMode ? "bg-gray-800 shadow rounded p-6" : "bg-white shadow rounded p-6"}>
+        <h3 className="text-lg font-bold mb-4">🚗 Car Management</h3>
+
+        {/* Form */}
+        <div className="flex flex-col md:flex-row gap-4 mb-6">
           <input
             type="text"
-            name="name"
-            value={newCar.name}
-            onChange={handleChange}
             placeholder="Car Name"
-            className="p-2 border rounded"
+            className="border p-2 rounded w-full"
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           />
           <input
             type="text"
-            name="type"
-            value={newCar.type}
-            onChange={handleChange}
-            placeholder="Car Type"
-            className="p-2 border rounded"
+            placeholder="Type (SUV, Sedan...)"
+            className="border p-2 rounded w-full"
+            value={formData.type}
+            onChange={(e) => setFormData({ ...formData, type: e.target.value })}
           />
           <input
             type="number"
-            name="price"
-            value={newCar.price}
-            onChange={handleChange}
-            placeholder="Price/Day"
-            className="p-2 border rounded"
+            placeholder="Price"
+            className="border p-2 rounded w-full"
+            value={formData.price}
+            onChange={(e) => setFormData({ ...formData, price: e.target.value })}
           />
           <input
             type="text"
-            name="image"
-            value={newCar.image}
-            onChange={handleChange}
             placeholder="Image URL"
-            className="p-2 border rounded"
+            className="border p-2 rounded w-full"
+            value={formData.image}
+            onChange={(e) => setFormData({ ...formData, image: e.target.value })}
           />
+          <button
+            onClick={handleAddOrUpdate}
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
+            {editIndex !== null ? "Update Car" : "Add Car"}
+          </button>
         </div>
-        <button
-          onClick={handleAddCar}
-          className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
-          Add Car
-        </button>
-      </div>
 
-      {/* Car List */}
-      <h2 className="text-2xl font-semibold mb-4">Car List</h2>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {cars.length > 0 ? (
-          cars.map((car) => (
-            <div key={car.id || car.name} className="bg-white shadow p-4 rounded">
-              <img
-                src={car.image}
-                alt={car.name}
-                className="h-40 w-full object-cover rounded mb-3"
-              />
-              <h3 className="text-lg font-bold">{car.name}</h3>
-              <p className="text-gray-600">{car.type}</p>
-              <p className="text-blue-600 font-semibold">${car.price}/day</p>
-
-              {car.id && (
-                <button
-                  onClick={() => handleDeleteCar(car.id)}
-                  className="mt-3 bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                >
-                  Delete
-                </button>
+        {/* Cars List */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {cars.map((car, index) => (
+            <div key={index} className="border rounded p-4 shadow flex flex-col">
+              <img src={car.image} alt={car.name} className="h-32 w-full object-cover mb-2 rounded" />
+              <h4 className="font-bold text-lg">{car.name}</h4>
+              <p className="text-sm text-gray-600">{car.type}</p>
+              <p className="text-blue-600 font-semibold">Rs{car.pricePerDay}</p>
+              {car.isLocal && (
+                <div className="mt-2 flex gap-2">
+                  <button
+                    onClick={() => handleEdit(index)}
+                    className="bg-yellow-500 text-white px-2 py-1 rounded text-sm"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDelete(index)}
+                    className="bg-red-600 text-white px-2 py-1 rounded text-sm"
+                  >
+                    Delete
+                  </button>
+                </div>
               )}
             </div>
-          ))
-        ) : (
-          <p>No cars available</p>
-        )}
+          ))}
+        </div>
       </div>
     </div>
   );
