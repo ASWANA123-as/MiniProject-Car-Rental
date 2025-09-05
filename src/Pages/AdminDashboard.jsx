@@ -8,7 +8,7 @@ import {
 export default function AdminDashboard() {
   const [cars, setCars] = useState([]);
   const [bookings, setBookings] = useState([]);
-  const [formData, setFormData] = useState({ id:"",name: "", type: "", price: "", image: "" });
+  const [formData, setFormData] = useState({  name: "", type: "", pricePerDay: "", image: "" });
   const [editIndex, setEditIndex] = useState(null);
   const [darkMode, setDarkMode] = useState(
     JSON.parse(localStorage.getItem("darkMode")) || false
@@ -28,7 +28,9 @@ export default function AdminDashboard() {
     const storedBookings = JSON.parse(localStorage.getItem("bookings")) || [];
     setBookings(storedBookings);
   }, []);
-const navigate = useNavigate();
+
+  const navigate = useNavigate();
+
   // --- Analytics ---
   const totalCars = cars.length;
   const totalBookings = bookings.length;
@@ -59,32 +61,50 @@ const navigate = useNavigate();
 
   // --- Car Management Functions ---
   const saveCarsToLocal = (updatedCars) => {
-    localStorage.setItem("adminCars", JSON.stringify(updatedCars.filter(c => c.isLocal)));
-  };
+  localStorage.setItem(
+    "adminCars",
+    JSON.stringify(updatedCars.filter((c) => c.isLocal))
+  );
+};
+const handleAddOrUpdate = () => {
+  console.log(formData,'formData')
+  if (!formData.name || !formData.type || !formData.pricePerDay || !formData.image) {
+    alert("Please fill all fields");
+    return;
+  }
 
-  const handleAddOrUpdate = () => {
-    if (!formData.name || !formData.type || !formData.price || !formData.image) {
-      alert("Please fill all fields");
-      return;
-    }
-    
+  let updatedCars;
+  if (editIndex !== null) {
+    // Update existing car
+    updatedCars = cars.map((car, i) =>
+      i === editIndex
+        ? {
+            ...formData,
+            id: car.id, // keep existing id
+            pricePerDay: Number(formData.pricePerDay),
+            isLocal: true,
+          }
+        : car
+    );
+    setEditIndex(null);
+  } else {
+    // Add new car with unique id
+    const newCar = {
+      ...formData,
+      id: Date.now(), // ✅ unique id
+      pricePerDay: Number(formData.pricePerDay),
+      isLocal: true,
+    };
+    updatedCars = [...cars, newCar];
+  }
+  {console.log(updatedCars,'updatedCars')}
 
-    let updatedCars;
-    if (editIndex !== null) {
-      // update existing
-      updatedCars = cars.map((car, i) =>
-        i === editIndex ? { ...formData, price: Number(formData.price), isLocal: true,id:21  } : car
-      );
-      setEditIndex(null);
-    } else {
-      // add new
-      updatedCars = [...cars, { ...formData, price: Number(formData.price), isLocal: true,id:21 }];
-    }
+  setCars(updatedCars);
+  saveCarsToLocal(updatedCars);
+  setFormData({ id: "", name: "", type: "", price: "", image: "" });
+};
 
-    setCars(updatedCars);
-    saveCarsToLocal(updatedCars);
-    setFormData({ id:"",name: "", type: "", price: "", image: "" });
-  };
+
 
   const handleEdit = (index) => {
     setFormData(cars[index]);
@@ -96,26 +116,30 @@ const navigate = useNavigate();
     setCars(updatedCars);
     saveCarsToLocal(updatedCars);
   };
-   useEffect(() => {
+
+  useEffect(() => {
     localStorage.setItem("darkMode", JSON.stringify(darkMode));
   }, [darkMode]);
 
   return (
-    <div className={darkMode ? "bg-gray-900 text-white min-h-screen p-8" : "bg-gray-100 text-black min-h-screen p-8"} >
-     
+    <div className={darkMode ? "bg-gray-900 text-white min-h-screen p-8" : "bg-gray-100 text-black min-h-screen p-8"}>
       <h1 className="text-3xl font-bold mb-6">📊 Admin Analytics Dashboard</h1>
-    <button
-            onClick={() => setDarkMode(!darkMode)}
-            className="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600"
-          >
-            {darkMode ? "☀️ Light Mode" : "🌙 Dark Mode"}
-          </button>
-           <button
-              onClick={() => navigate("/")}
-              className="px-4 py-2 rounded bg-red-500 text-white hover:bg-red-600"
-            >
-              Exit
-            </button>
+
+      <div className="flex gap-4 mb-6">
+        <button
+          onClick={() => setDarkMode(!darkMode)}
+          className="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600"
+        >
+          {darkMode ? "☀️ Light Mode" : "🌙 Dark Mode"}
+        </button>
+        <button
+          onClick={() => navigate("/")}
+          className="px-4 py-2 rounded bg-red-500 text-white hover:bg-red-600"
+        >
+          Exit
+        </button>
+      </div>
+
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
         <div className={darkMode ? "bg-gray-800 shadow p-6 rounded text-center" : "bg-white shadow p-6 rounded text-center"}>
@@ -134,7 +158,6 @@ const navigate = useNavigate();
 
       {/* Charts */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-        {/* Pie Chart */}
         <div className={darkMode ? "bg-gray-800 shadow rounded p-6" : "bg-white shadow rounded p-6"}>
           <h3 className="text-lg font-bold mb-4">Car Types Distribution</h3>
           <ResponsiveContainer width="100%" height={300}>
@@ -149,8 +172,7 @@ const navigate = useNavigate();
           </ResponsiveContainer>
         </div>
 
-        {/* Bar Chart */}
-        <div className="bg-white shadow rounded p-6">
+        <div className={darkMode ? "bg-gray-800 shadow rounded p-6" : "bg-white shadow rounded p-6"}>
           <h3 className="text-lg font-bold mb-4">Bookings per Car</h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={bookingData}>
@@ -187,10 +209,10 @@ const navigate = useNavigate();
           />
           <input
             type="number"
-            placeholder="Price"
+            placeholder="Price Per Day"
             className="border p-2 rounded w-full"
-            value={formData.price}
-            onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+            value={formData.pricePerDay}
+            onChange={(e) => setFormData({ ...formData, pricePerDay: e.target.value })}
           />
           <input
             type="text"
@@ -214,7 +236,7 @@ const navigate = useNavigate();
               <img src={car.image} alt={car.name} className="h-32 w-full object-cover mb-2 rounded" />
               <h4 className="font-bold text-lg">{car.name}</h4>
               <p className="text-sm text-gray-600">{car.type}</p>
-              <p className="text-blue-600 font-semibold">Rs{car.pricePerDay}</p>
+              <p className="text-blue-600 font-semibold">Rs {car.pricePerDay}</p>
               {car.isLocal && (
                 <div className="mt-2 flex gap-2">
                   <button

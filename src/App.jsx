@@ -16,6 +16,7 @@ import AdminDashboard from './Pages/AdminDashboard'
 import CustomerDashboard from './Pages/CustomerDashboard'
 import PaymentPage from './Pages/PaymentPage'
 import BookingsPage from './Pages/Bookings'
+import CheckoutModal from './Pages/CheckoutModal'
 function App() {
   const [count, setCount] = useState(0)
 
@@ -58,6 +59,7 @@ function App() {
     path: "/payment",
     element: <PaymentPage />,
   },
+  
   
   ])
 

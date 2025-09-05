@@ -10,6 +10,7 @@ export default function CustomerDashboard() {
   );
   const [searchType, setSearchType] = useState("");
   const [searchName, setsearchname] = useState("");
+  const [searchLocation, setsearchlocation] = useState("");
   const [SearchPrice, SetSearchPrice] = useState("");
   const [minPrice, setMinPrice] = useState(0);     // default minimum price
 const [maxPrice, setMaxPrice] = useState(10000); 
@@ -29,6 +30,7 @@ const [bookings, setBookings] = useState([]);
     .then(apiCars => {
       // Load admin-added cars from localStorage
       const localCars = JSON.parse(localStorage.getItem("adminCars")) || [];
+      console.log(localCars,'localcars')
       setCars([...apiCars, ...localCars]);
     })
       .catch((err) => console.error("Error fetching cars:", err));
@@ -111,7 +113,8 @@ const filteredCars = cars.filter(
     car.type?.toLowerCase().includes(searchType.toLowerCase()) &&
     car.name?.toLowerCase().includes(searchName.toLowerCase()) &&
      car.pricePerDay >= minPrice &&
-    car.pricePerDay <= maxPrice
+    car.pricePerDay <= maxPrice&&
+     car.Pickup?.toLowerCase().includes(searchLocation.toLowerCase())
 
 );
   
@@ -144,49 +147,92 @@ const filteredCars = cars.filter(
         </div>
 
         {/* Search Bar */}
-        <div className="mb-6">
-          <input
-            type="text"
-            placeholder="Search by car type (e.g., SUV, Sedan, Sport)..."
-            value={searchType}
-            onChange={(e) => setSearchType(e.target.value)}
-            className={`w-full md:w-1/2 p-2 border rounded shadow 
-              ${
-                darkMode
-                  ? "bg-gray-800 border-gray-700 text-white"
-                  : "bg-white border-gray-300 text-black"
-              }`}
-          />
-        </div>
-        <div className="mb-6">
-          <input
-            type="text"
-            placeholder="Search by car name"
-            value={searchName}
-            onChange={(e) => setsearchname(e.target.value)}
-            className={`w-full md:w-1/2 p-2 border rounded shadow 
-              ${
-                darkMode
-                  ? "bg-gray-800 border-gray-700 text-white"
-                  : "bg-white border-gray-300 text-black"
-              }`}
-          />
-        </div>
-        <div className="mb-6 flex gap-2">
-  <input
-    type="number"
-    placeholder="Min Price"
-    value={minPrice}
-    onChange={(e) => setMinPrice(Number(e.target.value))}
-    className="p-2 border rounded w-1/4"
-  />
-  <input
-    type="number"
-    placeholder="Max Price"
-    value={maxPrice}
-    onChange={(e) => setMaxPrice(Number(e.target.value))}
-    className="p-2 border rounded w-1/4"
-  />
+      
+<div
+  className={`shadow-lg rounded-xl p-6 mb-8 transition-colors duration-300 ${
+    darkMode ? "bg-gray-900 text-gray-100" : "bg-white text-gray-900"
+  }`}
+>
+  <h2 className={`text-xl font-semibold mb-6 ${darkMode ? "text-gray-100" : "text-gray-800"}`}>
+    🔎 Find Your Car
+  </h2>
+
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    {/* Car Type */}
+    <input
+      type="text"
+      placeholder="Type (SUV, Sedan, Sport)"
+      value={searchType}
+      onChange={(e) => setSearchType(e.target.value)}
+      className={`w-full p-3 border rounded-xl shadow-sm focus:ring-2 focus:outline-none focus:ring-blue-500 transition-colors duration-300 ${
+        darkMode
+          ? "bg-gray-800 border-gray-700 text-gray-100"
+          : "bg-white border-gray-300 text-gray-900"
+      }`}
+    />
+
+    {/* Car Name */}
+    <input
+      type="text"
+      placeholder="Car Name"
+      value={searchName}
+      onChange={(e) => setsearchname(e.target.value)}
+      className={`w-full p-3 border rounded-xl shadow-sm focus:ring-2 focus:outline-none focus:ring-blue-500 transition-colors duration-300 ${
+        darkMode
+          ? "bg-gray-800 border-gray-700 text-gray-100"
+          : "bg-white border-gray-300 text-gray-900"
+      }`}
+    />
+
+    {/* Price Range */}
+    <div className="flex gap-2">
+      <input
+        type="number"
+        placeholder="Min Price"
+        value={minPrice}
+        onChange={(e) => setMinPrice(Number(e.target.value))}
+        className={`w-1/2 p-3 border rounded-xl shadow-sm focus:ring-2 focus:outline-none focus:ring-blue-500 transition-colors duration-300 ${
+          darkMode
+            ? "bg-gray-800 border-gray-700 text-gray-100"
+            : "bg-white border-gray-300 text-gray-900"
+        }`}
+      />
+      <input
+        type="number"
+        placeholder="Max Price"
+        value={maxPrice}
+        onChange={(e) => setMaxPrice(Number(e.target.value))}
+        className={`w-1/2 p-3 border rounded-xl shadow-sm focus:ring-2 focus:outline-none focus:ring-blue-500 transition-colors duration-300 ${
+          darkMode
+            ? "bg-gray-800 border-gray-700 text-gray-100"
+            : "bg-white border-gray-300 text-gray-900"
+        }`}
+      />
+    </div>
+
+    {/* Pickup Location */}
+    <input
+      type="text"
+      placeholder="Pickup Location"
+      value={searchLocation}
+      onChange={(e) => setsearchlocation(e.target.value)}
+      className={`w-full p-3 border rounded-xl shadow-sm focus:ring-2 focus:outline-none focus:ring-blue-500 transition-colors duration-300 ${
+        darkMode
+          ? "bg-gray-800 border-gray-700 text-gray-100"
+          : "bg-white border-gray-300 text-gray-900"
+      }`}
+    />
+  </div>
+
+  {/* Search Button */}
+  {/* <div className="flex justify-end mt-6">
+    <button
+      onClick={() => console.log("apply filters")}
+      className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl shadow hover:bg-blue-700 transition duration-300"
+    >
+      Apply Filters
+    </button>
+  </div> */}
 </div>
 
 
