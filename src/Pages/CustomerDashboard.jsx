@@ -371,6 +371,7 @@ const filteredCars = cars.filter(
                 />
                 <h3 className="text-lg font-bold">{car.name}</h3>
                 <p className="text-gray-400">{car.type}</p>
+                <p className="text-gray-400">{car.Pickup}</p>
                 <p className="text-blue-400 font-semibold">RS{car.pricePerDay}/day</p>
 <button
   onClick={() => handleWishlistToggle(car)}
@@ -378,9 +379,9 @@ const filteredCars = cars.filter(
   className={`mt-2 px-3 py-1 rounded text-sm font-medium w-full transition 
     ${
       isBooked(car.id)
-        ? "bg-gray-400 text-white cursor-not-allowed"
+        ? "bg-red-600 text-white cursor-not-allowed"
         : isInWishlist(car.id)
-        ? "bg-red-500 text-white hover:bg-red-600"
+        ? "bg-purple-500 text-white hover:bg-red-600"
         : "bg-gray-200 text-black hover:bg-gray-300"
     }`}
 >

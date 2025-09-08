@@ -6,6 +6,7 @@ import CheckoutModal from "./CheckoutModal";
 export default function WishlistPage() {
   const navigate = useNavigate();
   const [wishlist, setWishlist] = useState([]);
+  const [duplicate,setDuplicate]=useState(false)
   const [selectedCar, setSelectedCar] = useState(null);
   const [darkMode, setDarkMode] = useState(
     JSON.parse(localStorage.getItem("darkMode")) || false
@@ -33,17 +34,21 @@ export default function WishlistPage() {
   const handleBook = (car) => {
     const booking=JSON.parse(localStorage.getItem("bookings"))
     const userBookings = booking[currentUser?.email] || [];
-    userBookings?.forEach(element => {
-        console.log(element,car);
-        if(element.id===car.id){
-            alert(`You already booked ${car.name}`);
-            return;
-        }
-        else{
- setSelectedCar(car)
-        }
-        
-    });
+     const alreadyBooked = userBookings.some((b) => b.id === car.id);
+
+  if (alreadyBooked) {
+    alert(`You already booked ${car.name}. Cannot book again.`);
+  } else {
+    setSelectedCar(car);
+    // navigate("/customer", { state: { preselectCarId: car.id } });
+  }
+
+    // if(duplicate){
+    //       alert(`You already booked ${car.name}. Cannot book again.`);
+    // }
+    // else{
+    //     setSelectedCar(car)
+    // };
  
     // navigate("/customer", { state: { preselectCarId: car.id } });
   };
@@ -110,6 +115,7 @@ export default function WishlistPage() {
           </div>
         )}
       </div>
+      {console.log(selectedCar,'yyy')}
       {selectedCar && (
               <CheckoutModal
                 selectedCar={selectedCar}

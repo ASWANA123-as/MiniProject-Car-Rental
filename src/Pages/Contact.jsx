@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import NavBar from '../Components/NavBar';
 
 const CarRentalContactForm = () => {
   const [formData, setFormData] = useState({
@@ -40,18 +41,22 @@ const CarRentalContactForm = () => {
   };
 
   return (
-   
-      <div className={!darkMode?"min-h-screen flex flex-col justify-center items-center bg-gray-100" :"min-h-screen flex flex-col justify-center items-center bg-gray-900 text-gray-900 text-white transition-colors duration-300 p-4"}>
+   <div>
+<NavBar/>
+     <div className={!darkMode?"min-h-screen flex flex-col justify-center items-center bg-gray-100" :"min-h-screen flex flex-col justify-center items-center bg-gray-900 text-gray-900 text-white transition-colors duration-300 p-4"}>
+       
 
         {/* Toggle Button */}
-        <div className="w-full max-w-xl flex justify-end mb-4">
-          <button
-            onClick={() => setDarkMode(!darkMode)}
-            className="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600 transition"
-          >
-            {darkMode ? "☀️ Light Mode" : "🌙 Dark Mode"}
-          </button>
-        </div>
+     <div className="relative mb-6 h-10">
+  {/* Dark Mode Toggle Button */}
+  <button
+    onClick={() => setDarkMode(!darkMode)}
+    className="absolute top-0 right-0 px-4 py-2 rounded bg-yellow-500 text-white hover:bg-blue-600 transition"
+  >
+    {darkMode ? "☀️"  : "🌙"}
+  </button>
+</div>
+
 
         {/* Form Container */}
         <div className={!darkMode?"w-full max-w-xl p-6 bg-white dark:bg-gray-800 text-gray-900" :"w-full max-w-xl p-6 text-gray-100 rounded-lg shadow-md transition-colors duration-300"}>
@@ -167,6 +172,8 @@ const CarRentalContactForm = () => {
           </form>
         </div>
       </div>
+   </div>
+     
    
   );
 };

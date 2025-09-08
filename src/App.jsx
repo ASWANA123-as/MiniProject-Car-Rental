@@ -67,7 +67,8 @@ function App() {
 
   {path: "/wishlist", element: <WishlistPage />},
    { path: "/wishlist/bookings", element: <BookingsPage /> },
-
+{ path: "/contact/bookings", element: <BookingsPage /> },
+{ path: "/contact/wishlist", element: <BookingsPage /> },
   ])
 
   return  <RouterProvider  router={router}/>

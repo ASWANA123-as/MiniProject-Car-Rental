@@ -17,9 +17,9 @@ const [search, setSearch] = useState("");
   const handleLoginClick = () => {
     navigate("/login"); // navigates to Login page
   };
-
+const user = JSON.parse(localStorage.getItem("currentUser"));
   const handleRentNow = (car) => {
-    const user = JSON.parse(localStorage.getItem("currentUser"));
+    
 
     if (!user) {
       // 🚨 Not logged in → redirect to login
@@ -87,12 +87,12 @@ const [search, setSearch] = useState("");
               <p className="text-gray-600 dark:text-gray-300 font-medium">
                 ₹{car.pricePerDay.toLocaleString()} / day
               </p>
-              <button
+             {user?.role=='Customer'&&(<button 
                 onClick={() => handleRentNow(car)}
                 className="mt-4 w-full bg-yellow-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition"
               >
                 Rent Now
-              </button>
+              </button>)} 
             </div>
           </div>
         </SwiperSlide>
