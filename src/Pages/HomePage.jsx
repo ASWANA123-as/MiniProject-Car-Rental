@@ -89,7 +89,7 @@ const [search, setSearch] = useState("");
               </p>
               <button
                 onClick={() => handleRentNow(car)}
-                className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition"
+                className="mt-4 w-full bg-yellow-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition"
               >
                 Rent Now
               </button>

@@ -17,6 +17,8 @@ import CustomerDashboard from './Pages/CustomerDashboard'
 import PaymentPage from './Pages/PaymentPage'
 import BookingsPage from './Pages/Bookings'
 import CheckoutModal from './Pages/CheckoutModal'
+import CarRentalContactForm from './Pages/Contact'
+import WishlistPage from './Pages/Wishlist'
 function App() {
   const [count, setCount] = useState(0)
 
@@ -32,7 +34,7 @@ function App() {
         {path:'/',element:<Home/>},
          {path:'/about',element:<About/>},
          
-           {path:'/contact',element:<Contact/>},
+           
          
       ]
     },
@@ -45,7 +47,9 @@ function App() {
   { path: "/customer", element: <CustomerDashboard />
    
    },
+  
    { path: "/customer/bookings", element: <BookingsPage /> },
+
    { path: "/bookings", element: <BookingsPage /> },
    {
     path: "/register",
@@ -59,8 +63,11 @@ function App() {
     path: "/payment",
     element: <PaymentPage />,
   },
-  
-  
+   {path: "/contact", element: <CarRentalContactForm />},
+
+  {path: "/wishlist", element: <WishlistPage />},
+   { path: "/wishlist/bookings", element: <BookingsPage /> },
+
   ])
 
   return  <RouterProvider  router={router}/>

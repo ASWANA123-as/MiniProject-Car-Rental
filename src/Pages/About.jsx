@@ -27,7 +27,7 @@ function About({ state }) {
               state ? "bg-gray-800 text-white" : "bg-white text-gray-800"
             }`}
           >
-            <h3 className="text-xl font-semibold text-blue-600 mb-2">
+            <h3 className="text-xl font-semibold text-yellow-600 mb-2">
               Wide Selection
             </h3>
             <p>
@@ -40,7 +40,7 @@ function About({ state }) {
               state ? "bg-gray-800 text-white" : "bg-white text-gray-800"
             }`}
           >
-            <h3 className="text-xl font-semibold text-blue-600 mb-2">
+            <h3 className="text-xl font-semibold text-yellow-600 mb-2">
               Affordable Pricing
             </h3>
             <p>
@@ -53,7 +53,7 @@ function About({ state }) {
               state ? "bg-gray-800 text-white" : "bg-white text-gray-800"
             }`}
           >
-            <h3 className="text-xl font-semibold text-blue-600 mb-2">
+            <h3 className="text-xl font-semibold text-yellow-600 mb-2">
               Trusted Service
             </h3>
             <p>

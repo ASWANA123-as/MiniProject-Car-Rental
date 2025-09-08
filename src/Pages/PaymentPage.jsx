@@ -6,6 +6,8 @@ export default function PaymentPage() {
   const navigate = useNavigate();
   const booking = location.state?.booking;
 
+  const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
+
   const [paymentMethod, setPaymentMethod] = useState("card");
   const [cardNumber, setCardNumber] = useState("");
   const [expiry, setExpiry] = useState("");
@@ -41,10 +43,12 @@ export default function PaymentPage() {
       return;
     }
 
-    // Save booking to localStorage
-    const storedBookings = JSON.parse(localStorage.getItem("bookings")) || [];
-    storedBookings.push(booking);
-    localStorage.setItem("bookings", JSON.stringify(storedBookings));
+    // ✅ Save booking per user
+    const allBookings = JSON.parse(localStorage.getItem("bookings")) || {};
+    const userBookings = allBookings[currentUser.email] || [];
+    userBookings.push(booking);
+    allBookings[currentUser.email] = userBookings;
+    localStorage.setItem("bookings", JSON.stringify(allBookings));
 
     alert(`✅ Payment successful via ${paymentMethod}! Booking confirmed.`);
     navigate("/customer");

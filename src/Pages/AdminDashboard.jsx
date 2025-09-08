@@ -7,15 +7,18 @@ import {
 
 export default function AdminDashboard() {
   const [cars, setCars] = useState([]);
-  const [bookings, setBookings] = useState([]);
-  const [formData, setFormData] = useState({  name: "", type: "", pricePerDay: "", image: "" });
+  const [bookings, setBookings] = useState({});
+  const [user, setUser] = useState({});
+  const [formData, setFormData] = useState({ name: "", type: "", pricePerDay: "", image: "", Pickup: "" });
   const [editIndex, setEditIndex] = useState(null);
   const [darkMode, setDarkMode] = useState(
     JSON.parse(localStorage.getItem("darkMode")) || false
   );
 
+  const navigate = useNavigate();
+
   useEffect(() => {
-    // Fetch cars from API
+    // Fetch cars
     fetch("https://aswana123-as.github.io/Cars_1_API/Cars.json")
       .then((res) => res.json())
       .then((data) => {
@@ -25,16 +28,31 @@ export default function AdminDashboard() {
       .catch((err) => console.error("Error fetching cars:", err));
 
     // Load bookings
-    const storedBookings = JSON.parse(localStorage.getItem("bookings")) || [];
+    const storedBookings = JSON.parse(localStorage.getItem("bookings")) || {};
     setBookings(storedBookings);
+
+    // Load user
+    const currentUser = JSON.parse(localStorage.getItem("currentUser")) || {};
+    setUser(currentUser);
   }, []);
 
-  const navigate = useNavigate();
-
   // --- Analytics ---
+
+  // Flatten all bookings from all users
+  const allBookings = Object.values(bookings).flat();
+
   const totalCars = cars.length;
-  const totalBookings = bookings.length;
-  const totalRevenue = bookings.reduce((sum, b) => sum + (b.totalCost || 0), 0);
+  const totalBookings = allBookings.length;
+  const totalRevenue = allBookings.reduce((sum, b) => sum + (b.totalCost || 0), 0);
+
+  const bookingCount = allBookings.reduce((acc, b) => {
+    acc[b.name] = (acc[b.name] || 0) + 1;
+    return acc;
+  }, {});
+
+  const bookingData = Object.entries(bookingCount)
+    .map(([name, count]) => ({ name, bookings: count }))
+    .sort((a, b) => b.bookings - a.bookings);
 
   const typeCount = cars.reduce((acc, car) => {
     acc[car.type] = (acc[car.type] || 0) + 1;
@@ -46,65 +64,53 @@ export default function AdminDashboard() {
     value: count,
   }));
 
-  const bookingCount = bookings.reduce((acc, b) => {
-    acc[b.name] = (acc[b.name] || 0) + 1;
-    return acc;
-  }, {});
-
-  const bookingData = Object.entries(bookingCount)
-    .map(([name, count]) => ({ name, bookings: count }))
-    .sort((a, b) => b.bookings - a.bookings);
-
   const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#A569BD"];
+
   const formatCurrency = (v) =>
     new Intl.NumberFormat("en-US", { style: "currency", currency: "INR" }).format(v);
 
-  // --- Car Management Functions ---
+  // --- Car Management ---
+
   const saveCarsToLocal = (updatedCars) => {
-  localStorage.setItem(
-    "adminCars",
-    JSON.stringify(updatedCars.filter((c) => c.isLocal))
-  );
-};
-const handleAddOrUpdate = () => {
-  console.log(formData,'formData')
-  if (!formData.name || !formData.type || !formData.pricePerDay || !formData.image) {
-    alert("Please fill all fields");
-    return;
-  }
-
-  let updatedCars;
-  if (editIndex !== null) {
-    // Update existing car
-    updatedCars = cars.map((car, i) =>
-      i === editIndex
-        ? {
-            ...formData,
-            id: car.id, // keep existing id
-            pricePerDay: Number(formData.pricePerDay),
-            isLocal: true,
-          }
-        : car
+    localStorage.setItem(
+      "adminCars",
+      JSON.stringify(updatedCars.filter((c) => c.isLocal))
     );
-    setEditIndex(null);
-  } else {
-    // Add new car with unique id
-    const newCar = {
-      ...formData,
-      id: Date.now(), // ✅ unique id
-      pricePerDay: Number(formData.pricePerDay),
-      isLocal: true,
-    };
-    updatedCars = [...cars, newCar];
-  }
-  {console.log(updatedCars,'updatedCars')}
+  };
 
-  setCars(updatedCars);
-  saveCarsToLocal(updatedCars);
-  setFormData({ id: "", name: "", type: "", price: "", image: "" });
-};
+  const handleAddOrUpdate = () => {
+    if (!formData.name || !formData.type || !formData.pricePerDay || !formData.image || !formData.Pickup) {
+      alert("Please fill all fields");
+      return;
+    }
 
+    let updatedCars;
+    if (editIndex !== null) {
+      updatedCars = cars.map((car, i) =>
+        i === editIndex
+          ? {
+              ...formData,
+              id: car.id,
+              pricePerDay: Number(formData.pricePerDay),
+              isLocal: true,
+            }
+          : car
+      );
+      setEditIndex(null);
+    } else {
+      const newCar = {
+        ...formData,
+        id: Date.now(),
+        pricePerDay: Number(formData.pricePerDay),
+        isLocal: true,
+      };
+      updatedCars = [...cars, newCar];
+    }
 
+    setCars(updatedCars);
+    saveCarsToLocal(updatedCars);
+    setFormData({ id: "", name: "", type: "", pricePerDay: "", image: "", Pickup: "" });
+  };
 
   const handleEdit = (index) => {
     setFormData(cars[index]);
@@ -125,12 +131,16 @@ const handleAddOrUpdate = () => {
     <div className={darkMode ? "bg-gray-900 text-white min-h-screen p-8" : "bg-gray-100 text-black min-h-screen p-8"}>
       <h1 className="text-3xl font-bold mb-6">📊 Admin Analytics Dashboard</h1>
 
+      <h1 className="text-4xl font-extrabold mb-6 text-center text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 via-yellow-500 to-pink-500">
+        👋 Welcome, {user.name}
+      </h1>
+
       <div className="flex gap-4 mb-6">
         <button
           onClick={() => setDarkMode(!darkMode)}
-          className="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600"
+          className="px-4 py-2 rounded bg-yellow-500 text-white hover:bg-yellow-600"
         >
-          {darkMode ? "☀️ Light Mode" : "🌙 Dark Mode"}
+          {darkMode ? "☀️" : "🌙"}
         </button>
         <button
           onClick={() => navigate("/")}
@@ -221,6 +231,13 @@ const handleAddOrUpdate = () => {
             value={formData.image}
             onChange={(e) => setFormData({ ...formData, image: e.target.value })}
           />
+          <input
+            type="text"
+            placeholder="Pickup Location"
+            className="border p-2 rounded w-full"
+            value={formData.Pickup}
+            onChange={(e) => setFormData({ ...formData, Pickup: e.target.value })}
+          />
           <button
             onClick={handleAddOrUpdate}
             className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
@@ -237,6 +254,7 @@ const handleAddOrUpdate = () => {
               <h4 className="font-bold text-lg">{car.name}</h4>
               <p className="text-sm text-gray-600">{car.type}</p>
               <p className="text-blue-600 font-semibold">Rs {car.pricePerDay}</p>
+              <p className="text-gray-500 text-sm">Pickup: {car.Pickup}</p>
               {car.isLocal && (
                 <div className="mt-2 flex gap-2">
                   <button

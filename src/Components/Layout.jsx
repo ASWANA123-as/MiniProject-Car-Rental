@@ -20,11 +20,11 @@ function Layout() {
   }, [darkMode]);
   return (
     <div className={darkMode ? "bg-gray-900 text-white" : "bg-white text-black"}>
-           <NavBar/>
+           <NavBar state={darkMode}/>
            <div className="flex justify-end p-4">
         <button
           onClick={() => setDarkMode(!darkMode)}
-          className="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600"
+          className="px-4 py-2 rounded bg-yellow-500 text-white hover:bg-yellow-700"
         >
           {darkMode ? "☀️ Light Mode" : "🌙 Dark Mode"}
         </button>

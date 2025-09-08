@@ -5,14 +5,15 @@ function Header({state}) {
   return (
     <header
        className={`py-20 text-center ${
-        state ? "bg-gray-800 text-white" : "bg-blue-600 text-white"
+        state ? "bg-gray-800 text-blue-500" : "bg-blue-600 text-blue-500"
       }`}
      style={{
-    backgroundImage: `url("https://tse4.mm.bing.net/th/id/OIP.PG4d8BQzt8oW1M5B2pphlgHaDt?rs=1&pid=ImgDetMain&o=7&rm=3")`,
+    backgroundImage: `url("https://hdqwalls.com/wallpapers/bugatti-divo-2018-4k-xu.jpg")`,
     backgroundRepeat: 'no-repeat',
     backgroundSize: 'cover',
     backgroundPosition: 'center',
-    minHeight: '400px' // optional: ensures the div has height
+    minHeight: '400px', // optional: ensures the div has height
+    color:"blue"
   }}
     >
       {/* Overlay */}
@@ -20,10 +21,10 @@ function Header({state}) {
 
       {/* Content */}
       <div className="relative z-10 text-white">
-        <h1 className="text-4xl md:text-5xl font-bold mb-4 drop-shadow-lg">
-          Welcome to Car Rental App
+        <h1 className="text-4xl text-yellow-700 md:text-5xl font-bold mb-4 drop-shadow-lg">
+          Welcome to Wheelio
         </h1>
-        <p className="text-lg md:text-xl mb-6 drop-shadow">
+        <p className=" text-yellow-400 text-lg md:text-xl mb-6 drop-shadow">
           Rent your dream car anytime, anywhere!
         </p>
 
@@ -31,13 +32,13 @@ function Header({state}) {
         <div className="flex justify-center gap-4">
           <Link
             to="/login"
-            className="bg-white text-blue-600 px-6 py-2 rounded font-semibold hover:bg-gray-200 transition"
+            className="bg-white text-yellow-600 px-6 py-2 rounded font-semibold hover:bg-gray-200 transition"
           >
             Login
           </Link>
           <Link
             to="/register"
-            className="bg-white text-blue-600 px-6 py-2 rounded font-semibold hover:bg-gray-200 transition"
+            className="bg-white text-yellow-600 px-6 py-2 rounded font-semibold hover:bg-gray-200 transition"
           >
             Register
           </Link>

@@ -5,15 +5,21 @@ import NavBar from "../Components/NavBar";
 CheckoutModal
 export default function CustomerDashboard() {
   const [cars, setCars] = useState([]);
+  const [isBooking, setIsBooking] = useState([]);
+   const [user ,setUser]=useState([]);
   const [bookedCars, setBookedCars] = useState(
     JSON.parse(localStorage.getItem("bookings")) || []
+
   );
+  const [wishlist, setWishlist] = useState([]);
+const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+
   const [searchType, setSearchType] = useState("");
   const [searchName, setsearchname] = useState("");
   const [searchLocation, setsearchlocation] = useState("");
   const [SearchPrice, SetSearchPrice] = useState("");
   const [minPrice, setMinPrice] = useState(0);     // default minimum price
-const [maxPrice, setMaxPrice] = useState(10000); 
+const [maxPrice, setMaxPrice] = useState(40000); 
   const [darkMode, setDarkMode] = useState(
     JSON.parse(localStorage.getItem("darkMode")) || false
     
@@ -35,22 +41,84 @@ const [bookings, setBookings] = useState([]);
     })
       .catch((err) => console.error("Error fetching cars:", err));
   }, []);
+    useEffect(() => {
+    // Fetch cars from API
+   
+        const currentUser = JSON.parse(localStorage.getItem("currentUser")) || [];
+        setUser(currentUser);
+       
+  }, []);
+  useEffect(() => {
+    
+  const allBookings = JSON.parse(localStorage.getItem("bookings")) || {};
+  
+  setBookedCars(allBookings[currentUser?.email] || []);
+}, []);
   const navigate = useNavigate();
+useEffect(() => {
+  const storedWishlists = JSON.parse(localStorage.getItem("wishlist")) || {};
+  setWishlist(storedWishlists[currentUser?.email] || []);
+}, []);
 
   // Save dark mode preference
   useEffect(() => {
     localStorage.setItem("darkMode", JSON.stringify(darkMode));
   }, [darkMode]);
-  const handleBook=(car)=>{
+
    
-      if (bookedCars.find((c) => c.id === car.id)) {
-     alert(`You already booked ${car.name}`);
-     return;
-   }
-   else{
- setSelectedCar(car);
-   }
-  }
+//       if (bookedCars.find((c) => c.id === car.id)) {
+//      alert(`You already booked ${car.name}`);
+//      return;
+//    }
+//    else{
+
+
+//   //    const allBookings = JSON.parse(localStorage.getItem("bookings")) || [];
+
+//   // const isAlreadyBooked = allBookings.some((booking) => booking.id === car.id);
+
+//   // if (isAlreadyBooked) {
+//   //   alert(`You already booked ${car.name}. Cannot add to wishlist.`);
+//   //   return;
+//   // }
+
+//   // const isAlreadyWished = wishlist.find((c) => c.id === car.id);
+//   // let updatedWishlist;
+
+//   // if (isAlreadyWished) {
+//   //   updatedWishlist = wishlist.filter((c) => c.id !== car.id);
+//   // } else {
+//   //   updatedWishlist = [...wishlist, car];
+//   // }
+
+//   // setWishlist(updatedWishlist);
+
+//   // const allWishlists = JSON.parse(localStorage.getItem("wishlist")) || {};
+//   // allWishlists[currentUser?.email] = updatedWishlist;
+//   // localStorage.setItem("wishlist", JSON.stringify(allWishlists));
+
+//      const allBookings = JSON.parse(localStorage.getItem("bookings")) || {};
+//      const IsAlreadyBooked = bookings.find((c) => c.id === car.id);
+//   let updatedBookList;
+
+//   if (IsAlreadyBooked) {
+//     updatedBookList = bookings.filter((c) => c.id !== car.id);
+//   } else {
+//     updatedBookList = [...bookings, car];
+//   }
+
+//   allBookings[currentUser?.email] = updatedBookList;
+//   localStorage.setItem("bookings", JSON.stringify(allBookings));
+//  setSelectedCar(updatedBookList);
+//    }
+ const handleBook = (car) => {
+    if (isBooked(car.id)) {
+      alert(`You already booked ${car.name}`);
+      return;
+    }
+    setSelectedCar(car);
+  };
+  
 
 //   const handleBook = (car) => {
 //     const days = rentalDays[car.id] || 1; // default 1 day if not entered
@@ -71,6 +139,44 @@ const [bookings, setBookings] = useState([]);
 //     localStorage.setItem("bookings", JSON.stringify(updatedBookings));
 //     alert(`You booked ${car.name} for ${days} days! Total: RS${totalCost}`);
 //   };
+const handleWishlistToggle = (car) => {
+  const allBookings = JSON.parse(localStorage.getItem("bookings")) || [];
+const userBookings = allBookings[currentUser?.email] || [];
+  const isAlreadyBooked = userBookings?.some((booking) => booking.id === car.id);
+
+  if (isAlreadyBooked) {
+    alert(`You already booked ${car.name}. Cannot add to wishlist.`);
+    return;
+  }
+
+  const isAlreadyWished = wishlist.find((c) => c.id === car.id);
+  let updatedWishlist;
+
+  if (isAlreadyWished) {
+    updatedWishlist = wishlist.filter((c) => c.id !== car.id);
+  } else {
+    updatedWishlist = [...wishlist, car];
+  }
+
+  setWishlist(updatedWishlist);
+
+  const allWishlists = JSON.parse(localStorage.getItem("wishlist")) || {};
+  allWishlists[currentUser?.email] = updatedWishlist;
+  localStorage.setItem("wishlist", JSON.stringify(allWishlists));
+};
+
+const isInWishlist = (carId) => {
+  return wishlist.some((car) => car.id === carId);
+};
+// const isBooked = (carId) => {
+//   const allBookings = JSON.parse(localStorage.getItem("bookings")) || [];
+//   return allBookings.some((b) => b.id === carId);
+// };
+
+const isBooked = (carId) => {
+  return bookedCars.some((booking) => booking.id === carId);
+};
+ 
      const handleCheckout = () => {
     if (!pickupDate || !dropoffDate) {
       alert("Please select pickup and drop-off dates");
@@ -95,15 +201,24 @@ const [bookings, setBookings] = useState([]);
       totalCost: selectedCar.pricePerDay * duration,
     };
 
-    const updatedBookings = [...bookings, booking];
-    setBookings(updatedBookings);
+    const allBookings = JSON.parse(localStorage.getItem("bookings")) || {};
+const userBookings = allBookings[currentUser.email] || [];
+
+const updatedUserBookings = [...userBookings, booking];
+allBookings[currentUser.email] = updatedUserBookings;
+
+setBookedCars(updatedUserBookings); // Update state
+localStorage.setItem("bookings", JSON.stringify(allBookings));
+
+setSelectedCar(null);
+setPickupDate("");
+setDropoffDate("");
+navigate("/payment", { state: { booking } });
+
     // localStorage.setItem("bookings", JSON.stringify(updatedBookings));
 
     // alert(`Booking Confirmed! Total: ₹${booking.totalCost}`);
-    setSelectedCar(null);
-    setPickupDate("");
-    setDropoffDate("");
-    navigate("/payment",{state:{booking}});
+   
 
   };
 {console.log(cars,'cars')}
@@ -132,11 +247,14 @@ const filteredCars = cars.filter(
         {/* Header with Dark Mode Toggle */}
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">Customer Dashboard</h1>
+           <h1 className="text-4xl font-extrabold mb-6 text-center text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 via-yellow-500 to-pink-500">
+  👋 Welcome, {user.name}
+</h1>
           <button
             onClick={() => setDarkMode(!darkMode)}
-            className="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600"
+            className="px-4 py-2 rounded bg-yellow-500 text-white hover:bg-yellow-600"
           >
-            {darkMode ? "☀️ Light Mode" : "🌙 Dark Mode"}
+            {darkMode ? "☀️" : "🌙"}
           </button>
            <button
               onClick={() => navigate("/")}
@@ -254,13 +372,31 @@ const filteredCars = cars.filter(
                 <h3 className="text-lg font-bold">{car.name}</h3>
                 <p className="text-gray-400">{car.type}</p>
                 <p className="text-blue-400 font-semibold">RS{car.pricePerDay}/day</p>
+<button
+  onClick={() => handleWishlistToggle(car)}
+  disabled={isBooked(car.id)} // 🚫 Disable if booked
+  className={`mt-2 px-3 py-1 rounded text-sm font-medium w-full transition 
+    ${
+      isBooked(car.id)
+        ? "bg-gray-400 text-white cursor-not-allowed"
+        : isInWishlist(car.id)
+        ? "bg-red-500 text-white hover:bg-red-600"
+        : "bg-gray-200 text-black hover:bg-gray-300"
+    }`}
+>
+  {isBooked(car.id)
+    ? "🚫 Already Booked"
+    : isInWishlist(car.id)
+    ? "❤️ Remove from Wishlist"
+    : "🤍 Add to Wishlist"}
+</button>
 
                 
                
 
                 <button
                   onClick={() => handleBook(car)}
-                  className="mt-3 bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 w-full"
+                  className="mt-3 bg-yellow-500 text-white px-3 py-1 rounded hover:bg-green-600 w-full"
                 >
                   Book Now
                 </button>
